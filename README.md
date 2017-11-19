@@ -6,7 +6,7 @@ and Eloquent for databse interaction. It is set up to use SQLite by default.
 You can get the companion app [here](https://github.com/Alx101/ZeiptIonicApp).
 
 ## Dependencies
-This project assumes a correct setup of composer.
+This project assumes a correct setup of [composer](https://getcomposer.org).
 
 ## Installation
 This assumes you're working in bash.

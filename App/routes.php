@@ -22,7 +22,7 @@ $app->get('/registercard/{cid}', function (Request $request, Response $response,
     $password = 'zeipt.com';
     $curl = curl_init($service_url);
     $curl_post_data = array(
-        'GCI' => $customer->cid;
+        'GCI' => $customer->cid
     );
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_POST, true);
