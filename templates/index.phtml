@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Slim 3</title>
+        <link href='//fonts.googleapis.com/css?family=Lato:300' rel='stylesheet' type='text/css'>
+        <style>
+            body {
+                margin: 50px 0 0 0;
+                padding: 0;
+                width: 100%;
+                font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+                text-align: center;
+                color: #aaa;
+                font-size: 18px;
+                background-color:whitesmoke;
+            }
+
+            h1 {
+                color: #719e40;
+                letter-spacing: -3px;
+                font-family: 'Lato', sans-serif;
+                font-size: 50px;
+                font-weight: 200;
+                margin-bottom: 0;
+            }
+            
+            .endpoints {
+                background-color:white;
+                border:1px solid gray;
+                border-radius:15px;
+                padding:1em;
+                text-align: left;
+                max-width:800px;
+                margin:0 auto;
+            }
+
+            .endpoints > ul {
+                margin:0;
+
+            }
+
+            .endpoints > ul > li {
+                padding:15px 0;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>API backend for Zeipt Rezeipt app</h1>
+        <div>A basic backend for the Receipt app built to showcase the Zeipt.io API.</div>
+        <h2>Endpoints</h2>
+        <div class="endpoints">
+            <ul>
+                <li>/registercustomer - <b>Registers a customer and sets up their customer ID, used to communicate with Zeipt</b></li>
+                <li>/registercard - <b>Sets up and presents the card registration form used for registering the customer ID with a card.</b></li>
+            </ul>
+        </div>
+    </body>
+</html>
