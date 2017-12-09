@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8"/>
-        <title>Slim 3</title>
+        <title>Zeipt App API</title>
         <link href='//fonts.googleapis.com/css?family=Lato:300' rel='stylesheet' type='text/css'>
         <style>
             body {
@@ -51,8 +51,11 @@
         <h2>Endpoints</h2>
         <div class="endpoints">
             <ul>
-                <li>/registercustomer - <b>Registers a customer and sets up their customer ID, used to communicate with Zeipt</b></li>
-                <li>/registercard - <b>Sets up and presents the card registration form used for registering the customer ID with a card.</b></li>
+                <!--li>/registercustomer - <b>Registers a customer and sets up their customer ID, used to communicate with Zeipt</b></li-->
+                <li>/registercard (get) - <b>Sets up and presents the card registration form used for registering the customer ID with a card.</b></li>
+                <li>/receipts (get) - <b>Retrieves a list of receipts connected to the customer</b></li>
+                <li>/SuccessPage (post) - <b>Endpoint where the card registration is snapped up on success</b></li>
+                <li>/FailPage (post9 - <b>Endpoint where the card registration ends up if it fails</b></li>
             </ul>
         </div>
     </body>
