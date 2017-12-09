@@ -44,13 +44,14 @@ $app->get('/registercustomer/{name}', function (Request $request, Response $resp
     $res = $this->CustomerController->createCustomer($name);
     if($res) {
         return $response->withJson([
-            'success' => 'true',
-            'msg' => "Customer $name created"
+            'success' => 1,
+            'msg' => "Customer $name created",
+            'cid' => $res->cid
         ]);
     } else {
         return $response->withJson([
-            'success' => 'false',
-            'msg' => "Customer $name already exists"
+            'success' => 0,
+            'msg' => "Failed to create customer!"
         ]);
     }
 });
@@ -63,7 +64,7 @@ $app->post('/FailPage', function (Request $request, Response $response) {
     return $this->renderer->render($response, 'fail.phtml');
 });
 
-$app->get('/receipts/{gcid}', function(Request $request, Response $response, $args) {
+$app->get('/receipts/{cid}', function(Request $request, Response $response, $args) {
     $customer = Customer::where('cid', $args['cid'])->first();
     if(!$customer) {
         $response->getBody()->write("Customer not found!");
@@ -87,4 +88,14 @@ $app->get('/receipts/{gcid}', function(Request $request, Response $response, $ar
     curl_close($curl);
     $response->getBody()->write($curl_response);
     return $response;
+});
+
+$app->get('/cards/{cid}', function(Request $request, Response $response, $args) {
+   return $response->withJson([
+       'success' => 1,
+       'cards' => [
+           'lastfour' => '1111',
+           'type' => 'Visa'
+       ]
+   ]);
 });

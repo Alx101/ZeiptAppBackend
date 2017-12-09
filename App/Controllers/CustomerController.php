@@ -12,9 +12,9 @@ class CustomerController
 
     public function createCustomer($name = "")
     {
-        $exists = (Customer::where('name', $name)->first() != null);
+        $exists = Customer::where('name', $name)->first();
         if($exists)
-            return false;
+            return $exists;
 
         $cid = md5(time().$name);
 
@@ -23,6 +23,6 @@ class CustomerController
             'cid' => $cid
         ]);
 
-        return true;
+        return $customer;
     }
 }
