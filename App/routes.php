@@ -94,8 +94,10 @@ $app->get('/cards/{cid}', function(Request $request, Response $response, $args) 
    return $response->withJson([
        'success' => 1,
        'cards' => [
-           'lastfour' => '1111',
-           'type' => 'Visa'
+           [
+               'lastfour' => '1111',
+                'type' => 'Visa'
+           ]
        ]
    ]);
 });
