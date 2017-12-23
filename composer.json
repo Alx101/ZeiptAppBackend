@@ -28,7 +28,10 @@
         }
     },
     "config": {
-        "process-timeout" : 0
+        "process-timeout" : 0,
+        "platform": {
+            "php": "5.6"
+        }
     },
     "scripts": {
         "start": "php -S localhost:8080 -t public public/index.php",

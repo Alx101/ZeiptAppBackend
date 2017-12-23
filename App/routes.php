@@ -10,7 +10,34 @@ $app->get('/', function (Request $request, Response $response) {
     return $this->renderer->render($response, 'index.phtml');
 });
 
-$app->get('/registercard/{cid}', function (Request $request, Response $response, $args) {
+$app->get('/setupbasedata', function(Request $request, Response $response) {
+    if(!Customer::where('cid', '1234')->first()) {
+        $customer = Customer::create([
+            'name' => 'Test Testerssson',
+            'cid' => '1234'
+        ]);
+
+        $response->getBody()->write("Test customer set up <br>");
+    }
+
+    $response->getBody()->write("All data has been set up");
+    return $response;
+});
+
+$app->get('/registercard/{cid}', function(Request $request, Response $response, $args) {
+    $customer = Customer::where('cid', $args['cid'])->first();
+
+    if(!$customer) {
+        $response->getBody()->write("Customer not found!");
+        return $response;
+    }
+
+    return $this->renderer->render($response, 'terms.phtml', [
+        'customerid' => $args['cid']
+    ]);
+});
+
+$app->get('/doregistercard/{cid}', function (Request $request, Response $response, $args) {
     //ob_start();
     $customer = Customer::where('cid', $args['cid'])->first();
 
