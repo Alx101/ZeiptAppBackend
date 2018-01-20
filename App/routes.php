@@ -128,3 +128,25 @@ $app->get('/cards/{cid}', function(Request $request, Response $response, $args) 
        ]
    ]);
 });
+
+$app->post('/login', function(Request $request, Response $response, $args) {
+    $name = $request->getParam('name');
+    if(!$name || strlen($name) == 0) {
+        return $response->withJson([
+            'success' => 0,
+            'msg' => 'Missing parameters'
+        ]);
+    }
+    $customer = Customer::where('name', $name)->first();
+    if(!$customer) {
+        return $response->withJson([
+            'success' => 0,
+            'msg' => 'Wrong username or password'
+        ]);
+    } else {
+        return $response->withJson([
+            'success' => 1,
+            'CID' => $customer->cid
+        ]);
+    }
+});
