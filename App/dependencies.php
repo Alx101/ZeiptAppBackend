@@ -3,6 +3,8 @@
 
 require 'Controllers/CustomerController.php';
 require 'Models/Customer.php';
+require 'Models/Session.php';
+require 'Models/Card.php';
 
 $container = $app->getContainer();
 
@@ -33,5 +35,6 @@ $container['db'] = function ($c) {
 
 $container['CustomerController'] = function($c) {
     $ctrl = new \App\Controllers\CustomerController();
+    $ctrl->sessionTime = $c->get('settings')['sessionExpire'];
     return $ctrl;
 };

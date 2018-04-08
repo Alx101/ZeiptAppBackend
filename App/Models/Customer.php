@@ -8,5 +8,10 @@ class Customer extends Model
 {
     protected $table = 'customers';
 
-    protected $fillable = ['name', 'cid'];
+    protected $fillable = ['name', 'cid', 'password'];
+
+    public function cards()
+    {
+        return $this->hasMany('App\Models\Card');
+    }
 }

@@ -7,10 +7,14 @@ use App\Controllers\CustomerController;
 // Routes
 
 $app->get('/', function (Request $request, Response $response) {
+    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     return $this->renderer->render($response, 'index.phtml');
 });
 
 $app->get('/setupbasedata', function(Request $request, Response $response) {
+    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     if(!Customer::where('cid', '1234')->first()) {
         $customer = Customer::create([
             'name' => 'Test Testerssson',
@@ -25,28 +29,30 @@ $app->get('/setupbasedata', function(Request $request, Response $response) {
 });
 
 $app->get('/registercard/{cid}', function(Request $request, Response $response, $args) {
-    $customer = Customer::where('cid', $args['cid'])->first();
-
+    $customer = $this->CustomerController->checkSession($request->getParam('token'), $args['cid']);
+    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     if(!$customer) {
         $response->getBody()->write("Customer not found!");
         return $response;
     }
 
     return $this->renderer->render($response, 'terms.phtml', [
-        'customerid' => $args['cid']
+        'customerid' => $args['cid'],
+        'token' => $request->getParam('token')
     ]);
 });
 
 $app->get('/doregistercard/{cid}', function (Request $request, Response $response, $args) {
-    //ob_start();
-    $customer = Customer::where('cid', $args['cid'])->first();
-
+    $customer = $this->CustomerController->checkSession($request->getParam('token'), $args['cid']);
+    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     if(!$customer) {
         $response->getBody()->write("Customer not found!");
         return $response;
     }
 
-    $service_url = 'http://zeipt.io/verifone/RegisterCard/';
+    $service_url = 'http://zeipt.io/zeipt/RegisterCard/';
     $username = 'alex';
     $password = 'zeipt.com';
     $curl = curl_init($service_url);
@@ -63,42 +69,100 @@ $app->get('/doregistercard/{cid}', function (Request $request, Response $respons
     curl_close($curl);
     $response->getBody()->write($curl_response);
     return $response;
-    //echo($curl_response);
 });
 
-$app->get('/registercustomer/{name}', function (Request $request, Response $response, $args) {
-    $name = $args['name'];
-    $res = $this->CustomerController->createCustomer($name);
+/* Deprecated, use new POST function */
+$app->get('/registercustomer/', function (Request $request, Response $response, $args) {
+    $name = $request->getParam('name');
+    $pass = $request->getParam('pass');
+    $res = $this->CustomerController->createCustomer($name, $pass);
+    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     if($res) {
+        $loginRes = $this->CustomerController->login($name, $pass);
+        if($loginRes) {
+            return $response->withJson([
+                'success' => 1,
+                'msg' => "Customer $name created",
+                'session_token' => $loginRes['session_token'],
+                'cid' => $res->cid
+            ]);
+        }
+    }
+
+    return $response->withJson([
+        'success' => 0,
+        'msg' => "Failed to create customer!"
+    ]);
+});
+
+$app->post('/registercustomer/', function (Request $request, Response $response, $args) {
+    $name = $request->getParam('name');
+    $pass = $request->getParam('pass');
+    $res = $this->CustomerController->createCustomer($name, $pass);
+    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    if($res) {
+        $loginRes = $this->CustomerController->login($name, $pass);
+        if($loginRes) {
+            return $response->withJson([
+                'success' => 1,
+                'msg' => "Customer $name created",
+                'session_token' => $loginRes['session_token'],
+                'cid' => $res->cid
+            ]);
+        }
+    }
+
+    return $response->withJson([
+        'success' => 0,
+        'msg' => "Failed to create customer!"
+    ]);
+});
+
+/*$app->post('/login/', function(Request $request, Response $response, $args) {
+    $name = $request->getParam('name');
+    $pass = $request->getParam('pass');
+    $loginRes = $this->CustomerController->login($name, $pass);
+    if($loginRes) {
         return $response->withJson([
             'success' => 1,
-            'msg' => "Customer $name created",
-            'cid' => $res->cid
+            'msg' => "Logged in",
+            'session_token' => $loginRes['session_token'],
+            'cid' => $loginRes['customer']->cid
         ]);
     } else {
         return $response->withJson([
             'success' => 0,
-            'msg' => "Failed to create customer!"
+            'msg' => "Wrong username or password"
         ]);
     }
-});
+});*/
 
 $app->post('/SuccessPage', function (Request $request, Response $response) {
+    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     return $this->renderer->render($response, 'success.phtml');
 });
 
 $app->post('/FailPage', function (Request $request, Response $response) {
+    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     return $this->renderer->render($response, 'fail.phtml');
 });
 
 $app->get('/receipts/{cid}', function(Request $request, Response $response, $args) {
-    $customer = Customer::where('cid', $args['cid'])->first();
+    $customer = $this->CustomerController->checkSession($request->getParam('token'), $args['cid']);
+    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     if(!$customer) {
-        $response->getBody()->write("Customer not found!");
-        return $response;
+        return $response->withJson([
+            'success' => 0,
+            'msg' => 'Invalid credentials'
+        ]);
     }
 
-    $service_url = 'http://zeipt.io/verifone/ReceiptZeipt/';
+    $service_url = 'http://zeipt.io/zeipt/ReceiptZeipt/';
     $username = 'alex';
     $password = 'zeipt.com';
     $curl = curl_init($service_url);
@@ -118,27 +182,35 @@ $app->get('/receipts/{cid}', function(Request $request, Response $response, $arg
 });
 
 $app->get('/cards/{cid}', function(Request $request, Response $response, $args) {
-   return $response->withJson([
-       'success' => 1,
-       'cards' => [
-           [
-               'lastfour' => '1111',
-                'type' => 'Visa'
-           ]
-       ]
-   ]);
+    $customer = $this->CustomerController->checkSession($request->getParam('token'), $args['cid']);
+    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    if($customer) {
+        return $response->withJson([
+            'success' => 1,
+            'cards' => $customer->cards
+        ]);
+    } else {
+        return $response->withJson([
+            'success' => 0,
+            'msg' => 'Invalid credentials'
+        ]);
+    }
 });
 
-$app->post('/login', function(Request $request, Response $response, $args) {
+$app->post('/login/', function(Request $request, Response $response, $args) {
+    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     $name = $request->getParam('name');
-    if(!$name || strlen($name) == 0) {
+    $pass = $request->getParam('password');
+    if(!$name || !$pass || strlen($name) == 0 || strlen($pass) == 0) {
         return $response->withJson([
             'success' => 0,
             'msg' => 'Missing parameters'
         ]);
     }
-    $customer = Customer::where('name', $name)->first();
-    if(!$customer) {
+    $res = $this->CustomerController->login($name, $pass);
+    if(!$res) {
         return $response->withJson([
             'success' => 0,
             'msg' => 'Wrong username or password'
@@ -146,7 +218,69 @@ $app->post('/login', function(Request $request, Response $response, $args) {
     } else {
         return $response->withJson([
             'success' => 1,
-            'CID' => $customer->cid
+            'CID' => $res['customer']->cid,
+            'session_token' => $res['session_token']
         ]);
     }
+});
+
+$app->post('/deletecard/{cid}/{cardid}', function(Request $request, Response $response, $args) {
+    $customer = $this->CustomerController->checkSession($request->getParam('token'), $args['cid']);
+    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    if(!$customer) {
+        return $response->withJson([
+            'success' => 0,
+            'msg' => 'Invalid credentials'
+        ]);
+    }
+
+    if($this->CustomerController->removeCard($customer->id, $args['cardid'])) {
+        return $response->withJson([
+            'success' => 1,
+            'msg' => 'Card removed'
+        ]);
+    } else {
+        return $response->withJson([
+            'success' => 0,
+            'msg' => 'No card to remove'
+        ]);
+    }
+});
+
+$app->post('/tempregcard/{cid}', function(Request $request, Response $response, $args) {
+    //Create a temporary card for this user
+    $customer = $this->CustomerController->checkSession($request->getParam('token'), $args['cid']);
+    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+
+    if(!$customer) {
+        return $response->withJson([
+            'success' => 0,
+            'msg' => 'Invalid credentials'
+        ]);
+    }
+
+    $lastfour = $request->getParam('lastfour');
+    $type = $request->getParam('type');
+    $expires = $request->getParam('expires');
+    if($lastfour && $expires && $type) {
+        $res = $this->CustomerController->createCard($customer->id, $lastfour, $expires, $type);
+        if($res) {
+            return $response->withJson([
+                'success' => 1,
+                'card' => $res
+            ]);
+        }
+    }
+
+    return $response->withJson([
+        'success' => 0,
+        'msg' => 'Failed to create card'
+    ]);
+});
+
+$app->map(['GET', 'POST', 'PUT', 'DELETE', 'PATCH'], '/{routes:.+}', function($req, $res) {
+    $handler = $this->notFoundHandler; // handle using the default Slim page not found handler
+    return $handler($req, $res);
 });
