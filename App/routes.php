@@ -6,15 +6,23 @@ use App\Models\Customer;
 use App\Controllers\CustomerController;
 // Routes
 
-$app->get('/', function (Request $request, Response $response) {
-    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+$app->options('/{routes:.+}', function ($request, $response, $args) {
+    return $response;
+});
+
+$app->add(function ($req, $res, $next) {
+    $response = $next($req, $res);
+    return $response
+        ->withHeader('Access-Control-Allow-Origin', '*')
+        ->withHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, X-Requested-With, Content-Type, Accept, Origin, Authorization')
         ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+});
+
+$app->get('/', function (Request $request, Response $response) {
     return $this->renderer->render($response, 'index.phtml');
 });
 
 $app->get('/setupbasedata', function(Request $request, Response $response) {
-    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     if(!Customer::where('cid', '1234')->first()) {
         $customer = Customer::create([
             'name' => 'Test Testerssson',
@@ -30,8 +38,6 @@ $app->get('/setupbasedata', function(Request $request, Response $response) {
 
 $app->get('/registercard/{cid}', function(Request $request, Response $response, $args) {
     $customer = $this->CustomerController->checkSession($request->getParam('token'), $args['cid']);
-    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     if(!$customer) {
         $response->getBody()->write("Customer not found!");
         return $response;
@@ -45,8 +51,6 @@ $app->get('/registercard/{cid}', function(Request $request, Response $response, 
 
 $app->get('/doregistercard/{cid}', function (Request $request, Response $response, $args) {
     $customer = $this->CustomerController->checkSession($request->getParam('token'), $args['cid']);
-    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     if(!$customer) {
         $response->getBody()->write("Customer not found!");
         return $response;
@@ -76,8 +80,6 @@ $app->get('/registercustomer/', function (Request $request, Response $response, 
     $name = $request->getParam('name');
     $pass = $request->getParam('pass');
     $res = $this->CustomerController->createCustomer($name, $pass);
-    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     if($res) {
         $loginRes = $this->CustomerController->login($name, $pass);
         if($loginRes) {
@@ -100,8 +102,6 @@ $app->post('/registercustomer/', function (Request $request, Response $response,
     $name = $request->getParam('name');
     $pass = $request->getParam('pass');
     $res = $this->CustomerController->createCustomer($name, $pass);
-    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     if($res) {
         $loginRes = $this->CustomerController->login($name, $pass);
         if($loginRes) {
@@ -140,21 +140,15 @@ $app->post('/registercustomer/', function (Request $request, Response $response,
 });*/
 
 $app->post('/SuccessPage', function (Request $request, Response $response) {
-    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     return $this->renderer->render($response, 'success.phtml');
 });
 
 $app->post('/FailPage', function (Request $request, Response $response) {
-    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     return $this->renderer->render($response, 'fail.phtml');
 });
 
 $app->get('/receipts/{cid}', function(Request $request, Response $response, $args) {
     $customer = $this->CustomerController->checkSession($request->getParam('token'), $args['cid']);
-    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     if(!$customer) {
         return $response->withJson([
             'success' => 0,
@@ -183,8 +177,6 @@ $app->get('/receipts/{cid}', function(Request $request, Response $response, $arg
 
 $app->get('/cards/{cid}', function(Request $request, Response $response, $args) {
     $customer = $this->CustomerController->checkSession($request->getParam('token'), $args['cid']);
-    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     if($customer) {
         return $response->withJson([
             'success' => 1,
@@ -199,8 +191,6 @@ $app->get('/cards/{cid}', function(Request $request, Response $response, $args) 
 });
 
 $app->post('/login/', function(Request $request, Response $response, $args) {
-    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     $name = $request->getParam('name');
     $pass = $request->getParam('password');
     if(!$name || !$pass || strlen($name) == 0 || strlen($pass) == 0) {
@@ -218,7 +208,7 @@ $app->post('/login/', function(Request $request, Response $response, $args) {
     } else {
         return $response->withJson([
             'success' => 1,
-            'CID' => $res['customer']->cid,
+            'GCID' => $res['customer']->cid,
             'session_token' => $res['session_token']
         ]);
     }
@@ -226,8 +216,6 @@ $app->post('/login/', function(Request $request, Response $response, $args) {
 
 $app->post('/deletecard/{cid}/{cardid}', function(Request $request, Response $response, $args) {
     $customer = $this->CustomerController->checkSession($request->getParam('token'), $args['cid']);
-    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     if(!$customer) {
         return $response->withJson([
             'success' => 0,
@@ -251,8 +239,6 @@ $app->post('/deletecard/{cid}/{cardid}', function(Request $request, Response $re
 $app->post('/tempregcard/{cid}', function(Request $request, Response $response, $args) {
     //Create a temporary card for this user
     $customer = $this->CustomerController->checkSession($request->getParam('token'), $args['cid']);
-    $response->withAddedHeader('Access-Control-Allow-Origin', '*')->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
-        ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
 
     if(!$customer) {
         return $response->withJson([
