@@ -55,13 +55,15 @@ $app->get('/doregistercard/{cid}', function (Request $request, Response $respons
         $response->getBody()->write("Customer not found!");
         return $response;
     }
+    //Register a card for later processing
+    $this->CustomerController->registerCard($customer->id);
 
     $service_url = 'http://zeipt.io/zeipt/RegisterCard/';
     $username = 'alex';
     $password = 'zeipt.com';
     $curl = curl_init($service_url);
     $curl_post_data = array(
-        'GCI' => $customer->cid
+        'GCID' => $customer->cid
     );
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_POST, true);
@@ -139,11 +141,28 @@ $app->post('/registercustomer/', function (Request $request, Response $response,
     }
 });*/
 
-$app->post('/SuccessPage', function (Request $request, Response $response) {
-    return $this->renderer->render($response, 'success.phtml');
+$app->get('/SuccessPage', function (Request $request, Response $response) {
+    $gcid = $request->getParam('GCID');
+    $token = $request->getParam('Token');
+    $type = $request->getParam('CardType');
+    $expire = $request->getParam('CardExpDate');
+    $maskedNum = $request->getParam('CardMaskedPan');
+    if(strlen($gcid) > 0) {
+        $customer = Customer::where('cid', $gcid)->first();
+        if($customer) {
+            $this->CustomerController->saveCard($customer->id, $maskedNum, $expire, $type);
+            return $this->renderer->render($response, 'success.phtml');
+        }
+    }
+    return $this->renderer->render($response, 'fail.phtml');
 });
 
-$app->post('/FailPage', function (Request $request, Response $response) {
+$app->get('/FailPage', function (Request $request, Response $response) {
+    $gcid = $request->getParam('GCID');
+    if(strlen($gcid) > 0) {
+        $customer = Customer::where('cid', $gcid)->first();
+        $this->clearRegisteredCards($customer->id);
+    }
     return $this->renderer->render($response, 'fail.phtml');
 });
 
@@ -161,7 +180,7 @@ $app->get('/receipts/{cid}', function(Request $request, Response $response, $arg
     $password = 'zeipt.com';
     $curl = curl_init($service_url);
     $curl_post_data = array(
-        'GCI' => $customer->cid
+        'GCID' => $customer->cid
     );
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($curl, CURLOPT_POST, true);
@@ -210,6 +229,21 @@ $app->post('/login/', function(Request $request, Response $response, $args) {
             'success' => 1,
             'GCID' => $res['customer']->cid,
             'session_token' => $res['session_token']
+        ]);
+    }
+});
+
+$app->post('/refreshLogin/{cid}', function(Request $request, Response $response, $args) {
+    $customer = $this->CustomerController->checkSession($request->getParam('token'), $args['cid']);
+    if($customer) {
+        return $response->withJson([
+            'success' => 1,
+            'session_token' => $this->CustomerController->makeSession($customer)
+        ]);
+    } else {
+        return $response->withJson([
+            'success' => 0,
+            'msg' => 'Session could not be refreshed. Please log in again'
         ]);
     }
 });

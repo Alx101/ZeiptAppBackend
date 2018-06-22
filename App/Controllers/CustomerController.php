@@ -36,6 +36,23 @@ class CustomerController
         return $customer;
     }
 
+    public function makeSession($customer)
+    {
+        $old_sessions = Session::where('customer_id', $customer->id)->where('expired', '0')->get();
+        foreach($old_sessions as $old) {
+            $old->expired = true;
+            $old->save();
+        }
+
+        $hash = password_hash(time().$customer->name, PASSWORD_BCRYPT);
+        Session::create([
+            'customer_id' => $customer->id,
+            'expired' => '0',
+            'token' => $hash
+        ]);
+        return $hash;
+    }
+
     public function login($name, $pass)
     {
         $exists = Customer::where('name', $name)->first();
@@ -46,12 +63,7 @@ class CustomerController
                 $old->save();
             }
 
-            $hash = password_hash(time().$name, PASSWORD_BCRYPT);
-            Session::create([
-                'customer_id' => $exists->id,
-                'expired' => '0',
-                'token' => $hash
-            ]);
+            $hash = $this->makeSession($exists);
 
             return ['customer' => $exists, 'session_token' => $hash];
         }
@@ -109,6 +121,12 @@ class CustomerController
         }
     }
 
+    public function clearRegisteredCards($customer_id)
+    {
+        Card::where('customer_id', $customer_id)->whereNull('lastfour')->delete();
+        return true;
+    }
+
     public function saveCard($customer_id, $number, $expire, $type)
     {
         $card = Card::where('customer_id', $customer_id)->whereNull('lastfour')->first();
@@ -117,6 +135,7 @@ class CustomerController
             $card->card_expires = $expire;
             $card->card_type = $type;
             $card->save();
+            $this->clearRegisteredCards($customer_id); //Clean up old registered cards
             return $card;
         }
         return false;
