@@ -142,7 +142,9 @@ $app->get('/FailPage', function (Request $request, Response $response) {
     $gcid = $request->getParam('GCID');
     if(strlen($gcid) > 0) {
         $customer = Customer::where('cid', $gcid)->first();
-        $this->CustomerController->clearRegisteredCards($customer->id);
+        if($customer) {
+            $this->CustomerController->clearRegisteredCards($customer->id);
+        }
     }
     return $this->renderer->render($response, 'fail.phtml');
 });

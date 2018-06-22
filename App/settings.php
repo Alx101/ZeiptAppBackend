@@ -3,7 +3,9 @@ return [
     'settings' => [
         'displayErrorDetails' => true, // set to false in production
         'addContentLengthHeader' => false, // Allow the web server to send the content-length header
-
+        'globals' => [
+            'assetsUrl' =>  'https://demo.zeipt.se/public/assets',
+        ],
         // Renderer settings
         'renderer' => [
             'template_path' => __DIR__ . '/../templates/',
