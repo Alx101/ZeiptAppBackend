@@ -122,25 +122,6 @@ $app->post('/registercustomer/', function (Request $request, Response $response,
     ]);
 });
 
-/*$app->post('/login/', function(Request $request, Response $response, $args) {
-    $name = $request->getParam('name');
-    $pass = $request->getParam('pass');
-    $loginRes = $this->CustomerController->login($name, $pass);
-    if($loginRes) {
-        return $response->withJson([
-            'success' => 1,
-            'msg' => "Logged in",
-            'session_token' => $loginRes['session_token'],
-            'cid' => $loginRes['customer']->cid
-        ]);
-    } else {
-        return $response->withJson([
-            'success' => 0,
-            'msg' => "Wrong username or password"
-        ]);
-    }
-});*/
-
 $app->get('/SuccessPage', function (Request $request, Response $response) {
     $gcid = $request->getParam('GCID');
     $token = $request->getParam('Token');

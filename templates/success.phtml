@@ -1,40 +1,166 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8"/>
-        <title>Card registered</title>
-        <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-        <link href='//fonts.googleapis.com/css?family=Lato:300' rel='stylesheet' type='text/css'>
+        <meta charset="utf-8">
+        <title>Zeipt App API</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <link href="//fonts.googleapis.com/css?family=Lato:300" rel="stylesheet" type="text/css">
         <style>
             body {
-                margin: 50px 0 0 0;
-                padding: 0;
+                margin: 43px 0 0 0;
                 width: 100%;
                 font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-                text-align: center;
-                color: #aaa;
+                text-align: left;
+                color: black;
                 font-size: 18px;
-                background-color:whitesmoke;
+                background-color: #F1F5FA;
             }
 
-            h1 {
-                color: #719e40;
-                letter-spacing: -3px;
-                font-family: 'Lato', sans-serif;
-                font-size: 50px;
-                font-weight: 200;
-                margin-bottom: 0;
+            .container {
+                padding: 10px 15px 80px;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+
+            .banner {
+                position: fixed;
+                display: flex;
+                background-color: #0F2841;
+                left: 0;
+                right: 0;
+                height: 43px;
+                top: 0;
+                flex-direction: row;
+                align-items: center;
+                overflow: hidden;
+            }
+
+            .banner img {
+                width: 30px;
+                display: table-cell;
+                margin: auto;
+            }
+
+            .banner-content {
+                vertical-align: middle;
+                display: table;
+                width: 100%;
+                padding: 0 10px;
+            }
+
+            .row {
+                width: 100%;
+                height: 100%;
+                display: table-row;
+            }
+
+            .column {
+                display: table-cell;
+                width: 33.33%;
+                vertical-align: middle;
+                position: relative;
+            }
+
+            .column.left {
+                text-align: left;
+            }
+
+            .column.center {
+                text-align: center;
+            }
+
+            .column.right {
+                text-align: right;
+            }
+
+            .column.left img {
+                float: left;
+                height: 30px;
+                width: unset;
+            }
+
+            .column.center img {
+                box-shadow: 0 0 50px #3CBF71;
+                border-radius: 100px;
+            }
+
+            .approve-form {
+                text-align: center;
+                position: fixed;
+                bottom: 0px;
+                left: 0;
+                right: 0;
+                padding: 20px;
+                background-color: rgba(242, 245, 251, 0.9);
+                background: linear-gradient(to bottom, rgba(242, 245, 251, 0), rgba(242, 245, 251, 1));
+            }
+
+            .terms-approve {
+                background-color: #3CBF71;
+                color: white;
+                border-radius: 2px;
+                cursor: pointer;
+                transition: all .2s;
+                font-size: 16px;
+                margin: auto;
+                width: 100%;
+                border: none;
+                padding: 20px;
+            }
+
+            .terms-approve.disabled {
+                color: #585858;
+                background-color: buttonface;
+            }
+
+            .success {
+                background-color: rgba(60, 191, 113, 1);
+                border-radius: 500px;
+                text-align: center;
+                width: 200px;
+                height: 200px;
+                margin: auto;
+                margin-top: 40px;
+            }
+
+            .success img {
+                height: 160px;
+                transition: 0.3s;
+                transform: translateY(-30px) rotateZ(10deg);
+            }
+
+            .success h2 {
+                margin: auto;
+                transform: translateY(-30px);
+                color: white;
+            }
+
+            h3.success-note {
+                text-align: center;
             }
         </style>
     </head>
     <body>
-        <h1>Card has been registered, you can now close this page. It will close automatically in 3 seconds</h1>
-        <script>
-            $(document).ready(function() {
-                setTimeout(function(){
-                    window.close();
-                }, 3000);
-            });
-        </script>
+        <div class="banner">
+            <div class="banner-content">
+                <div class="row">
+                    <div class="column left">
+                        <img src="/assets/img/zeipt.png">
+                    </div>
+                    <div class="column center">
+                        <img src="/assets/img/receiptguy.svg">
+                    </div>
+                    <div class="column right">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="success">
+                <img src="/assets/img/like.png">
+                <h2>Success!</h2>
+            </div>
+            <h3 class="success-note">Your card has been registered. Please return to the app.</h3>
+        </div>
     </body>
 </html>
