@@ -161,7 +161,7 @@ $app->get('/FailPage', function (Request $request, Response $response) {
     $gcid = $request->getParam('GCID');
     if(strlen($gcid) > 0) {
         $customer = Customer::where('cid', $gcid)->first();
-        $this->clearRegisteredCards($customer->id);
+        $this->CustomerController->clearRegisteredCards($customer->id);
     }
     return $this->renderer->render($response, 'fail.phtml');
 });
@@ -225,6 +225,7 @@ $app->post('/login/', function(Request $request, Response $response, $args) {
             'msg' => 'Wrong username or password'
         ]);
     } else {
+        $this->CustomerController->clearRegisteredCards($res['customer']->id);
         return $response->withJson([
             'success' => 1,
             'GCID' => $res['customer']->cid,
@@ -236,6 +237,7 @@ $app->post('/login/', function(Request $request, Response $response, $args) {
 $app->post('/refreshLogin/{cid}', function(Request $request, Response $response, $args) {
     $customer = $this->CustomerController->checkSession($request->getParam('token'), $args['cid']);
     if($customer) {
+        $this->CustomerController->clearRegisteredCards($customer->id);
         return $response->withJson([
             'success' => 1,
             'session_token' => $this->CustomerController->makeSession($customer)
