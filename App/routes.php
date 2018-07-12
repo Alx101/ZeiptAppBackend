@@ -158,7 +158,7 @@ $app->get('/receipts/{cid}', function(Request $request, Response $response, $arg
         ]);
     }
 
-    $service_url = 'http://zeipt.io/zeipt/ReceiptZeipt/';
+    $service_url = 'http://zeipt.io/zeipt/GetReceipt/';
     $username = 'alex';
     $password = 'zeipt.com';
     $curl = curl_init($service_url);
