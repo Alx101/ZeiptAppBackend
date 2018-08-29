@@ -58,7 +58,7 @@ $app->get('/doregistercard/{cid}', function (Request $request, Response $respons
     //Register a card for later processing
     $this->CustomerController->registerCard($customer->id);
 
-    $service_url = 'http://zeipt.io/zeipt/RegisterCard/';
+    $service_url = 'https://zeipt.io/zeipt/RegisterCard/';
     $username = 'alex';
     $password = 'zeipt.com';
     $curl = curl_init($service_url);
@@ -158,7 +158,7 @@ $app->get('/receipts/{cid}', function(Request $request, Response $response, $arg
         ]);
     }
 
-    $service_url = 'http://zeipt.io/zeipt/GetReceipt/';
+    $service_url = 'https://zeipt.io/zeipt/GetReceipt/';
     $username = 'alex';
     $password = 'zeipt.com';
     $curl = curl_init($service_url);
